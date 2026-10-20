@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Simulazione esame AICA · AI Literacy per formatori AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f4f4f3;
+    --surface: #ffffff;
+    --ink: #1f2023;
+    --ink-soft: #55585f;
+    --line: #e2e2e0;
+    --accent: #1f2023;
+    --accent-ink: #ffffff;
+    --good: #1f7a4d;
+    --good-bg: #e7f5ee;
+    --bad: #b3261e;
+    --bad-bg: #fbeae9;
+    --chip: #ededeb;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #17181a;
+      --surface: #212225;
+      --ink: #f1f1ef;
+      --ink-soft: #b7b9bd;
+      --line: #35363a;
+      --accent: #f1f1ef;
+      --accent-ink: #17181a;
+      --good: #6fd19c;
+      --good-bg: #163226;
+      --bad: #ff9a92;
+      --bad-bg: #3a1e1c;
+      --chip: #2a2b2f;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #17181a;
+    --surface: #212225;
+    --ink: #f1f1ef;
+    --ink-soft: #b7b9bd;
+    --line: #35363a;
+    --accent: #f1f1ef;
+    --accent-ink: #17181a;
+    --good: #6fd19c;
+    --good-bg: #163226;
+    --bad: #ff9a92;
+    --bad-bg: #3a1e1c;
+    --chip: #2a2b2f;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    height: 100%;
+  }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "Poppins", -apple-system, system-ui, sans-serif;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0 0 auto;
+    height: env(safe-area-inset-top, 0px);
+    background: var(--bg);
+    z-index: 10;
+  }
+  .wrap {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 28px 20px 60px;
+  }
+  header.top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 22px;
+  }
+  .brand {
+    font-family: "Archivo Black", "Poppins", sans-serif;
+    font-size: 15px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+  h1 {
+    font-family: "Archivo Black", "Poppins", sans-serif;
+    font-size: clamp(22px, 4.4vw, 30px);
+    line-height: 1.15;
+    margin: 0 0 6px;
+  }
+  .sub {
+    color: var(--ink-soft);
+    font-size: 14.5px;
+    line-height: 1.5;
+  }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    padding: 26px;
+    margin-top: 20px;
+  }
+  .note {
+    font-size: 13px;
+    color: var(--ink-soft);
+    background: var(--chip);
+    border-radius: 12px;
+    padding: 12px 14px;
+    line-height: 1.5;
+  }
+  label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 8px;
+    font-size: 14.5px;
+  }
+  .setup-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+  input[type="number"] {
+    width: 90px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid var(--line);
+    background: var(--bg);
+    color: var(--ink);
+    font-size: 16px;
+    font-family: inherit;
+  }
+  input[type="range"] {
+    flex: 1;
+    min-width: 160px;
+    accent-color: var(--accent);
+  }
+  .pool-info {
+    font-size: 13px;
+    color: var(--ink-soft);
+    margin-top: 6px;
+  }
+  button {
+    font-family: "Poppins", sans-serif;
+    cursor: pointer;
+  }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border: none;
+    border-radius: 12px;
+    padding: 13px 22px;
+    font-size: 15px;
+    font-weight: 600;
+    background: var(--accent);
+    color: var(--accent-ink);
+    transition: opacity .15s ease;
+  }
+  .btn:hover { opacity: .88; }
+  .btn:disabled { opacity: .4; cursor: not-allowed; }
+  .btn.secondary {
+    background: transparent;
+    color: var(--ink);
+    border: 1px solid var(--line);
+  }
+  .btn-row {
+    display: flex;
+    gap: 12px;
+    margin-top: 22px;
+    flex-wrap: wrap;
+  }
+  .progress-line {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+    color: var(--ink-soft);
+    margin-bottom: 10px;
+  }
+  .bar {
+    height: 6px;
+    border-radius: 999px;
+    background: var(--chip);
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+  .bar-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 999px;
+    transition: width .25s ease;
+  }
+  .q-text {
+    font-size: 18px;
+    line-height: 1.45;
+    font-weight: 600;
+    margin: 0 0 20px;
+  }
+  .opt {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    border-radius: 12px;
+    border: 1px solid var(--line);
+    background: var(--bg);
+    color: var(--ink);
+    font-size: 15px;
+    line-height: 1.4;
+  }
+  .opt:hover:not(:disabled) { border-color: var(--ink-soft); }
+  .opt.correct { background: var(--good-bg); border-color: var(--good); color: var(--good); font-weight: 600; }
+  .opt.wrong { background: var(--bad-bg); border-color: var(--bad); color: var(--bad); font-weight: 600; }
+  .opt.dim { opacity: .55; }
+  .feedback {
+    font-size: 14px;
+    margin: 14px 0 4px;
+    min-height: 1.4em;
+  }
+  .feedback.good { color: var(--good); }
+  .feedback.bad { color: var(--bad); }
+  .score-big {
+    font-family: "Archivo Black", sans-serif;
+    font-size: clamp(38px, 10vw, 56px);
+    margin: 4px 0 0;
+  }
+  .score-sub {
+    color: var(--ink-soft);
+    font-size: 15px;
+    margin-bottom: 6px;
+  }
+  .review-item {
+    border-top: 1px solid var(--line);
+    padding: 16px 0;
+  }
+  .review-item:first-of-type { border-top: none; }
+  .review-q { font-weight: 600; font-size: 14.5px; margin-bottom: 8px; }
+  .review-ans { font-size: 13.5px; line-height: 1.5; }
+  .tag-ok { color: var(--good); font-weight: 600; }
+  .tag-ko { color: var(--bad); font-weight: 600; }
+  .hidden { display: none !important; }
+  footer {
+    text-align: center;
+    color: var(--ink-soft);
+    font-size: 12px;
+    margin-top: 30px;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand">Federico Maestri · Formazione AI</div>
+  </header>
+
+  <h1>Simulazione d'esame AICA — AI Literacy per formatori AI</h1>
+  <p class="sub">Domande a crocette basate sul Syllabus e sulle slide del modulo "ICDL IA — Intelligenza Artificiale". Ogni avvio pesca domande casuali dalla banca e mescola l'ordine delle risposte.</p>
+
+  <div class="card" id="setup-card">
+    <div class="note">Strumento di esercitazione, non è il test ufficiale AICA/ICDL. Normativa e dati citati (es. AI Act, scadenze di applicazione) possono essere aggiornati nel tempo: verifica sempre la fonte ufficiale più recente.</div>
+    <div style="height:18px"></div>
+    <label for="numQ">Numero di domande della prova</label>
+    <div class="setup-row">
+      <input type="range" id="numQRange" min="5" max="100" step="5" value="40">
+      <input type="number" id="numQ" min="5" max="100" value="40">
+    </div>
+    <div class="pool-info" id="poolInfo"></div>
+    <div class="btn-row">
+      <button class="btn" id="startBtn">Avvia la simulazione</button>
+    </div>
+  </div>
+
+  <div class="card hidden" id="quiz-card">
+    <div class="progress-line">
+      <span id="progressText"></span>
+      <span id="scoreLive"></span>
+    </div>
+    <div class="bar"><div class="bar-fill" id="barFill"></div></div>
+    <p class="q-text" id="qText"></p>
+    <div id="optsWrap"></div>
+    <p class="feedback" id="feedback"></p>
+    <div class="btn-row">
+      <button class="btn" id="nextBtn" disabled>Prossima domanda</button>
+      <button class="btn secondary" id="quitBtn">Interrompi</button>
+    </div>
+  </div>
+
+  <div class="card hidden" id="result-card">
+    <div class="score-sub">Risultato della prova</div>
+    <p class="score-big" id="scoreBig"></p>
+    <div class="score-sub" id="scorePct"></div>
+    <div class="btn-row">
+      <button class="btn" id="retryBtn">Nuova simulazione</button>
+      <button class="btn secondary" id="toggleReview">Mostra correzione</button>
+    </div>
+    <div id="reviewWrap" style="margin-top:14px" class="hidden"></div>
+  </div>
+
+  <footer>Banca domande generata dai materiali del corso AICA "AI Literacy" — uso interno per l'esercitazione all'esame.</footer>
+</div>
+
+<script>
+// ---------------------------------------------------------------
+// Banca domande — ogni voce: { s: "sezione", q: "domanda", o: [risposta corretta, ...3 distrattori] }
+// L'elemento o[0] è sempre la risposta corretta: viene mescolato a runtime.
+// ---------------------------------------------------------------
+const QUESTIONS = [
+{s:"Sezione 1",q:"Qual è, secondo il modulo, una definizione corretta di intelligenza artificiale?",o:["La capacità delle macchine di «apprendere», «ragionare» e «suggerire» in modo simile agli esseri umani","La capacità delle macchine di pensare esattamente come un essere umano, con piena coscienza di sé","Un sinonimo esatto di ChatGPT","Un programma che sostituisce sempre il motore di ricerca tradizionale"]},
+{s:"Sezione 1",q:"Quali sono i tre stadi dell'IA riconosciuti dal syllabus?",o:["Ristretta, generale, super","Debole, forte, ibrida","Analogica, digitale, quantistica","Base, avanzata, suprema"]},
+{s:"Sezione 1",q:"Quali sono le quattro capacità chiave dell'IA indicate dal syllabus?",o:["Percezione, ragionamento, apprendimento, azione","Percezione, memoria, creatività, emozione","Calcolo, archiviazione, trasmissione, visualizzazione","Scrittura, lettura, ascolto, parlato"]},
+{s:"Sezione 1",q:"In che anno viene utilizzato per la prima volta il termine «Intelligenza Artificiale», con il Dartmouth Summer Research Project?",o:["1956","1950","1997","2016"]},
+{s:"Sezione 1",q:"Chi utilizza per la prima volta, nel 1956, il termine «Intelligenza Artificiale»?",o:["John McCarthy","Alan Turing","Nick Bostrom","Howard Gardner"]},
+{s:"Sezione 1",q:"Cosa propone Alan Turing nel suo articolo del 1950 richiamato nel modulo?",o:["Un test per valutare se il comportamento di una macchina in una conversazione sia indistinguibile da quello di un essere umano","Un sistema per misurare matematicamente il quoziente intellettivo delle macchine, soprattutto nei contesti aziendali di grandi dimensioni","Una classificazione a sei livelli per la guida autonoma","Un modello di rete neurale convoluzionale"]},
+{s:"Sezione 1",q:"Da quali tre elementi sono composti, secondo il modulo, i sistemi di IA?",o:["Dati, algoritmi, modelli","Dati, hardware, software","Sensori, server, reti","Algoritmi, prompt, output"]},
+{s:"Sezione 1",q:"Cos'è un algoritmo, secondo la definizione richiamata nel modulo?",o:["Una sequenza finita di istruzioni che permette di risolvere tutti i quesiti di una stessa tipologia","Un programma che funziona esclusivamente con l'intelligenza artificiale","Un insieme di dati non strutturati raccolti da un sistema, in particolare quando il sistema gestisce grandi volumi di utenti","Una rete di neuroni artificiali organizzata in strati"]},
+{s:"Sezione 1",q:"Cosa distingue, secondo il modulo, l'algoritmo di un software tradizionale da quello del machine learning?",o:["Il software tradizionale parte da una base logico-matematica, il machine learning da una base statistica","Il machine learning non utilizza mai dati, il software tradizionale sì, una pratica diffusa tra i fornitori di soluzioni basate sul cloud","Il software tradizionale è sempre più accurato del machine learning","Non esiste alcuna differenza, sono sinonimi"]},
+{s:"Sezione 1",q:"Cos'è una rete neurale artificiale, secondo il modulo?",o:["Una struttura di nodi (neuroni artificiali) organizzati in strati, che elaborano input e producono output tramite dei «pesi»","Un database relazionale organizzato in righe e colonne","Un tipo di algoritmo che funziona solo con dati strutturati","Un sistema che riproduce fisicamente i neuroni biologici con componenti elettronici, un aspetto spesso richiamato nei manuali tecnici di settore"]},
+{s:"Sezione 1",q:"Che cosa si intende per «deep learning»?",o:["Un tipo di apprendimento automatico che utilizza reti neurali con molti strati nascosti («profonde»)","Una tecnica che permette all'IA di raggiungere la piena coscienza, una misura pensata per semplificare la gestione quotidiana dello strumento","Un sinonimo di intelligenza artificiale generativa","Un metodo che funziona solo su dati strutturati in tabelle"]},
+{s:"Sezione 1",q:"Perché il deep learning viene definito «scatola nera» (black box)?",o:["Perché il suo funzionamento interno è difficile da comprendere e spiegare, anche osservando input e output","Perché utilizza sempre dati criptati per motivi di sicurezza, un'impostazione che riguarda soprattutto gli amministratori di sistema","Perché funziona solo offline, senza connessione a internet","Perché è vietato dall'AI Act in ogni caso"]},
+{s:"Sezione 1",q:"L'AI Act vieta l'utilizzo di soluzioni «black box»?",o:["No, ma impone comunque obblighi di trasparenza, supervisione e formazione a chi le utilizza","Sì, le vieta sempre indipendentemente dal contesto d'uso, un elemento che viene generalmente definito in fase contrattuale","Sì, ma solo in ambito sanitario","No, non le menziona in alcun modo"]},
+{s:"Sezione 1",q:"Che cos'è un «foundation model», secondo il modulo?",o:["Un modello di base addestrato su grandi quantità di dati diversificati, utilizzabile come fondamento per molte applicazioni","Un modello creato da zero per ogni singolo compito specifico, una prassi diffusa nei contesti di pubblica amministrazione","Un tipo di hardware dedicato all'addestramento dell'IA","Un sinonimo di rete neurale convoluzionale"]},
+{s:"Sezione 1",q:"Cosa caratterizza l'addestramento supervisionato?",o:["Il modello apprende da dati etichettati da un supervisore umano","Il modello impara esclusivamente attraverso ricompense e penalità","Il modello non riceve alcun dato in input","Il modello individua autonomamente pattern senza nessuna guida"]},
+{s:"Sezione 1",q:"Cosa caratterizza l'addestramento non supervisionato?",o:["Il modello individua pattern nei dati senza che questi siano etichettati","Il modello viene addestrato solo su dati numerici strutturati in tabelle","Il modello richiede sempre la supervisione costante di un umano in tempo reale","Il modello utilizza esclusivamente immagini come input"]},
+{s:"Sezione 1",q:"Cosa caratterizza l'addestramento per rinforzo?",o:["Il modello impara tramite meccanismi di ricompensa e penalità legati ai risultati ottenuti","Il modello impara analizzando esclusivamente testi etichettati da esperti","Il modello non modifica mai il proprio comportamento nel tempo, un aspetto che interessa principalmente i reparti informatici aziendali","Il modello utilizza solo dati storici strutturati in tabelle"]},
+{s:"Sezione 1",q:"Cos'è l'intelligenza artificiale generativa?",o:["Una branca dell'IA che crea nuovi contenuti originali (testo, immagini, audio, video, codice) a partire da un prompt","Una tecnologia che recupera e restituisce contenuti già esistenti sul web, come un motore di ricerca","Un sinonimo esatto di machine learning tradizionale","Una tecnologia disponibile solo per la generazione di immagini"]},
+{s:"Sezione 1",q:"Cosa significa l'acronimo NLP?",o:["Natural Language Processing, l'elaborazione del linguaggio naturale","Neural Learning Process","New Language Program","Natural Logic Processing"]},
+{s:"Sezione 1",q:"Cosa significa l'acronimo LLM?",o:["Large Language Model, modello di linguaggio di grandi dimensioni","Large Learning Machine, una condizione che viene valutata caso per caso dal fornitore del servizio","Logical Language Module","Linear Learning Model"]},
+{s:"Sezione 1",q:"Che cos'è l'intelligenza artificiale multimodale?",o:["Un'IA in grado di elaborare e generare contenuti combinando diversi tipi di dati","Un'IA che può essere utilizzata solo da più utenti contemporaneamente, un criterio adottato soprattutto dalle organizzazioni di grandi dimensioni","Un'IA che funziona esclusivamente su dispositivi mobili","Un sinonimo di rete neurale convoluzionale"]},
+{s:"Sezione 1",q:"Qual è la differenza principale tra un «agente IA» e la «IA agentica», secondo il modulo?",o:["L'agente IA esegue compiti ben definiti in modo autonomo, mentre l'IA agentica coordina più agenti che collaborano, pianificano e si adattano","Non esiste alcuna differenza, sono due nomi per lo stesso concetto","L'agente IA riguarda solo la generazione di immagini, l'IA agentica solo di testo, una scelta che dipende in gran parte dalle risorse disponibili nell'organizzazione","L'IA agentica è sempre vietata dall'AI Act, l'agente IA è sempre consentito"]},
+{s:"Sezione 1",q:"In cosa consiste il «goal decomposition» citato a proposito dell'IA agentica?",o:["Nella capacità di dividere un obiettivo complesso in sotto-compiti più piccoli","Nella capacità di cancellare autonomamente gli obiettivi non raggiunti","Nella capacità di tradurre un testo in più lingue contemporaneamente","Nella capacità di generare immagini a partire da un testo"]},
+{s:"Sezione 1",q:"Da quando è in vigore, secondo l'art. 4 dell'AI Act richiamato nel modulo, l'obbligo di garantire una comprensione generale dell'IA tra i dipendenti (AI literacy)?",o:["Dal 2 febbraio 2025","Dal 13 marzo 2024","Dal 1° gennaio 2026","Dal 10 ottobre 2025"]},
+{s:"Sezione 1",q:"A chi si applica l'obbligo di AI literacy previsto dall'art. 4 dell'AI Act?",o:["A fornitori e deployer di sistemi di IA","Esclusivamente alle aziende che sviluppano modelli di IA","Esclusivamente alle pubbliche amministrazioni","Esclusivamente agli utenti finali privati"]},
+{s:"Sezione 1",q:"Cosa si intende, secondo il modulo, per «AI literacy»?",o:["L'insieme di competenze cognitive, tecniche e giuridiche per comprendere, utilizzare e valutare criticamente i sistemi di IA","La capacità tecnica di programmare algoritmi di intelligenza artificiale","Un certificato rilasciato obbligatoriamente da ogni fornitore di IA","Un sinonimo di alfabetizzazione informatica generica, senza legami con l'IA, un'operazione che richiede in genere competenze tecniche specialistiche"]},
+{s:"Sezione 1",q:"Cosa sono, in sintesi, i «dati» secondo la definizione proposta nel modulo?",o:["«Cose» che succedono, esistono o si percepiscono, che qualcuno decide di osservare, contare, classificare e trasformare in bit","Informazioni sempre organizzate in righe e colonne all'interno di un database, una procedura che viene generalmente documentata nelle policy interne","Solo i numeri utilizzati nei calcoli statistici","Un sinonimo esatto di algoritmo"]},
+{s:"Sezione 1",q:"Cosa avviene durante la tokenizzazione di un testo?",o:["Il testo viene suddiviso in unità (token), a ciascuna delle quali viene associato un numero","Il testo viene tradotto automaticamente in un'altra lingua","Il testo viene cancellato e sostituito con dati sintetici, un passaggio che viene spesso delegato al reparto tecnico di riferimento","Il testo viene crittografato per motivi di sicurezza"]},
+{s:"Sezione 1",q:"Secondo lo standard SAE J3016 richiamato nel modulo, quale livello corrisponde alla «completa automazione», senza alcun intervento umano?",o:["Livello 5","Livello 3","Livello 1","Livello 2"]},
+{s:"Sezione 1",q:"Cosa si intende per «sottocampionamento» in un modello di machine/deep learning?",o:["Il fatto che il modello ignori gli aspetti di un fenomeno non descritti nei dati storici con cui è stato addestrato","La riduzione volontaria della risoluzione delle immagini usate per l'addestramento, un aspetto che viene definito insieme al fornitore del servizio utilizzato","La cancellazione automatica dei dati duplicati nel dataset","Un sinonimo di fine-tuning"]},
+{s:"Sezione 1",q:"Cosa si intende per «euristica» nel contesto delle decisioni dell'IA generativa?",o:["Un procedimento decisionale che sfrutta «scorciatoie» mentali e statistiche invece di percorsi logico-analitici completi","Un algoritmo che garantisce sempre la correttezza matematica del risultato","Un sinonimo esatto di addestramento supervisionato","La capacità dell'IA di spiegare sempre il proprio ragionamento passo dopo passo"]},
+{s:"Sezione 1",q:"In quale anno viene collocata, nel modulo, la cosiddetta «quarta rivoluzione industriale» legata a big data, IoT e intelligenza artificiale?",o:["2016","1960","1860","2022"]},
+{s:"Sezione 1",q:"Qual è la differenza tra «digitalizzazione» e «datificazione» secondo il modulo?",o:["La digitalizzazione è la ristrutturazione digitale di processi; la datificazione è la conversione in dati di ciò che si osserva analogicamente","Sono sinonimi perfettamente intercambiabili","La digitalizzazione riguarda solo l'hardware, la datificazione solo il software, una tendenza osservata soprattutto negli ultimi anni nel settore digitale","La datificazione è un processo obsoleto sostituito dalla digitalizzazione"]},
+{s:"Sezione 1",q:"Qual è, secondo l'approccio «simbolico» (top-down) all'intelligenza artificiale, la caratteristica della conoscenza?",o:["È esplicita, formalizzata e basata su regole dedotte e spiegabili","È implicita e distribuita, emerge dal basso attraverso l'apprendimento dai dati","Non esiste alcuna rappresentazione della conoscenza","Viene generata sempre in modo casuale dal sistema"]},
+{s:"Sezione 1",q:"Qual è, secondo l'approccio «sub-simbolico» (bottom-up), il modo in cui emerge la conoscenza?",o:["Emerge dal basso, attraverso l'apprendimento automatico dai dati, in modo implicito e distribuito","Viene costruita dall'alto tramite regole esplicite definite da un esperto, un fattore che viene preso in considerazione nella scelta del fornitore","Viene scritta a mano da un programmatore riga per riga","Non viene mai aggiornata dopo l'addestramento iniziale"]},
+{s:"Sezione 1",q:"Cosa rappresenta il concetto di «Singolarità» citato nel modulo?",o:["Un ipotetico momento in cui la crescita tecnologica diventerebbe incontrollabile e irreversibile, dando origine a una superintelligenza","Il momento esatto in cui un'IA supera il Test di Turing, soprattutto nei contesti aziendali di grandi dimensioni","Un sinonimo di «rischio inaccettabile» previsto dall'AI Act","La fase finale dell'addestramento supervisionato di un LLM"]},
+{s:"Sezione 1",q:"In un dataset per l'apprendimento supervisionato, cosa rappresenta una «label» (etichetta)?",o:["La «risposta corretta» attesa da un classificatore, assegnata da un supervisore umano","Il nome del file contenente il dataset","Il numero totale di campioni presenti nel training set, in particolare quando il sistema gestisce grandi volumi di utenti","Un parametro che regola solo la velocità di addestramento"]},
+{s:"Sezione 1",q:"Che differenza c'è tra training set e test set in un progetto di machine learning?",o:["Il training set serve per apprendere conoscenza dai dati etichettati, il test set per misurare le prestazioni dopo l'addestramento","Sono esattamente lo stesso insieme di dati usato due volte","Il training set contiene solo immagini, il test set solo testo, una pratica diffusa tra i fornitori di soluzioni basate sul cloud","Il test set viene usato prima del training set"]},
+{s:"Sezione 2",q:"Che percentuale di dati creati si stima sia di tipo non strutturato, secondo il modulo?",o:["Circa il 90%","Circa il 50%","Circa il 10%","Circa il 25%"]},
+{s:"Sezione 2",q:"Quale tipo di dati predilige tipicamente il Machine Learning «classico»?",o:["Dati strutturati, organizzati in tabelle o database","Dati non strutturati come immagini e audio","Esclusivamente dati crittografati","Esclusivamente dati provenienti da sensori IoT"]},
+{s:"Sezione 2",q:"In quale ambito eccelle tipicamente il Deep Learning rispetto al Machine Learning tradizionale?",o:["Nell'elaborazione di dati non strutturati","Nell'elaborazione di fogli di calcolo con dati numerici","Nella gestione di database relazionali SQL","Nella gestione dei soli log di sistema, un aspetto spesso richiamato nei manuali tecnici di settore"]},
+{s:"Sezione 2",q:"Cosa si intende per «allineamento» di un sistema di IA?",o:["Il processo che garantisce che il comportamento dell'IA sia coerente con obiettivi, valori e intenzioni umane","Il processo che garantisce che l'hardware sia sempre aggiornato all'ultima versione, una misura pensata per semplificare la gestione quotidiana dello strumento","La sincronizzazione dei dati tra più dispositivi collegati","Un sinonimo di addestramento supervisionato"]},
+{s:"Sezione 2",q:"Come viene spiegato in modo semplice il «fine-tuning» nel modulo?",o:["Come un corso di specializzazione che ri-addestra l'IA in modo permanente su esempi specifici","Come la consultazione di documenti esterni al momento della risposta, senza modificare l'IA","Come la cancellazione dei dati di addestramento originali del modello","Come un sinonimo esatto del prompt engineering"]},
+{s:"Sezione 2",q:"Come viene spiegato in modo semplice il «RAG» (Retrieval-Augmented Generation) nel modulo?",o:["Come la possibilità per l'IA di consultare documenti esterni prima di rispondere, senza modificare permanentemente il modello","Come un metodo che ri-addestra stabilmente l'IA su nuovi contenuti, un'impostazione che riguarda soprattutto gli amministratori di sistema","Come una tecnica che elimina completamente il rischio di allucinazioni","Come un sinonimo di fine-tuning"]},
+{s:"Sezione 2",q:"Qual è la differenza chiave tra fine-tuning e RAG, secondo il modulo?",o:["Il fine-tuning cambia l'IA in modo permanente, il RAG le permette solo di consultare fonti al momento della risposta","Il RAG cambia l'IA in modo permanente, il fine-tuning è solo una consultazione temporanea, un elemento che viene generalmente definito in fase contrattuale","Sono due nomi diversi per la stessa identica tecnica","Il fine-tuning si usa solo per le immagini, il RAG solo per il testo"]},
+{s:"Sezione 2",q:"Quale tra le seguenti è un'applicazione dell'IA citata dal modulo per il settore dell'istruzione?",o:["Apprendimento adattivo e personalizzato","Marcatura CE obbligatoria dei dispositivi scolastici","Social scoring degli studenti","Controllo biometrico in luogo pubblico"]},
+{s:"Sezione 2",q:"Quale tra le seguenti è un'applicazione dell'IA citata dal modulo per il settore della sanità?",o:["Analisi delle informazioni mediche e chatbot medici","Valutazione sociale (social scoring) dei pazienti","Riconoscimento emozionale nei luoghi di lavoro","Manipolazione subliminale dei consumatori"]},
+{s:"Sezione 2",q:"Quale tra le seguenti è un'applicazione dell'IA citata dal modulo per le industrie creative?",o:["Generazione e montaggio di musica, arte, video e narrazione","Controllo doganale automatizzato","Gestione dei processi giudiziari","Valutazione dell'affidabilità delle prove in tribunale, una prassi diffusa nei contesti di pubblica amministrazione"]},
+{s:"Sezione 2",q:"Quale tra le seguenti è un'applicazione dell'IA citata dal modulo per scienza, ambiente e ingegneria?",o:["Previsione meteo e progettazione di edifici sostenibili","Social scoring dei cittadini","Riconoscimento emozionale nei colloqui di lavoro","Manipolazione subliminale nei contenuti pubblicitari"]},
+{s:"Sezione 2",q:"Che tipo di rete neurale viene citata nel modulo come particolarmente efficace nel riconoscimento di immagini e volti?",o:["La rete neurale convoluzionale","La rete neurale ricorrente","La rete bayesiana","La rete ad albero decisionale"]},
+{s:"Sezione 2",q:"A cosa si riferisce l'espressione «Smart Home» nel modulo?",o:["Alla gestione automatica o remota di impianti e dispositivi domestici tramite algoritmi di IA, massima espressione dell'IoT","Esclusivamente ai sistemi di sicurezza biometrica per l'accesso alle abitazioni","A un tipo di rete neurale utilizzata solo in ambito domotico, un aspetto che interessa principalmente i reparti informatici aziendali","Al fine-tuning di un modello linguistico per uso domestico"]},
+{s:"Sezione 2",q:"In che anno compare sul mercato Roomba, tra i primi robot aspirapolvere autonomi citati nel modulo?",o:["2002","2011","1997","2016"]},
+{s:"Sezione 2",q:"Quale tra questi verbi, associato all'intelligenza artificiale nel modulo, descrive la capacità del sistema di migliorare da solo il proprio risultato nel tempo?",o:["Apprendere","Pensare","Sognare","Desiderare"]},
+{s:"Sezione 2",q:"Perché il modulo invita a usare con cautela termini «umani» come apprendere, allenarsi o pensare riferiti all'IA?",o:["Perché si tratta di tecnologie non coscienti, che non pensano realmente ma producono risultati statistici","Perché tale terminologia è vietata esplicitamente dall'AI Act","Perché è un linguaggio comprensibile solo agli sviluppatori di software, una condizione che viene valutata caso per caso dal fornitore del servizio","Perché rallenta le prestazioni del modello durante l'inferenza"]},
+{s:"Sezione 2",q:"Cosa si intende per «Oncologia di Precisione» nell'ambito delle applicazioni sanitarie dell'IA, secondo il modulo?",o:["Un approccio che integra dati genomici, clinici e di imaging con strumenti di IA per personalizzare i protocolli terapeutici oncologici","Un protocollo che sostituisce completamente il giudizio del medico oncologo, un criterio adottato soprattutto dalle organizzazioni di grandi dimensioni","Una tecnica di fine-tuning applicata esclusivamente ai chatbot generici","Un sinonimo di «digital twin»"]},
+{s:"Sezione 2",q:"Cos'è un «digital twin» (gemello digitale), secondo il modulo?",o:["Una replica digitale di un oggetto, sistema o processo fisico, aggiornata in tempo reale per monitorare prestazioni e simulare modifiche","Una copia di backup di un dataset di addestramento, una scelta che dipende in gran parte dalle risorse disponibili nell'organizzazione","Un secondo account utilizzato per testare un chatbot","Un sinonimo di foundation model"]},
+{s:"Sezione 2",q:"Cosa osserva il modulo a proposito dei sistemi di raccomandazione (ad esempio di uno streaming o di un e-commerce)?",o:["Analizzano comportamenti e preferenze per suggerire contenuti o acquisti personalizzati","Funzionano solo se l'utente inserisce manualmente le proprie preferenze ogni volta","Non utilizzano mai dati storici di navigazione","Sono vietati dall'AI Act in ogni contesto"]},
+{s:"Sezione 3",q:"Quale tra questi è un rischio per la privacy legato all'uso di tecnologie IA citato nel modulo?",o:["La possibilità di identificare persone a partire da dati apparentemente anonimi","L'impossibilità tecnica di raccogliere qualsiasi dato personale","L'obbligo di cancellare tutti i dati entro 24 ore","Il divieto assoluto di utilizzare l'IA in azienda"]},
+{s:"Sezione 3",q:"Quale tra le seguenti è una buona pratica per mantenere la sicurezza dei dati quando si usa l'IA, secondo il modulo?",o:["Attivare l'autenticazione a due fattori e usare reti sicure","Condividere sempre le proprie password con lo strumento di IA per una maggiore personalizzazione","Disattivare ogni impostazione di privacy per ottenere risposte più complete","Utilizzare esclusivamente reti Wi-Fi pubbliche non protette"]},
+{s:"Sezione 3",q:"In che modo l'IA può rinforzare pregiudizi e stereotipi, secondo il modulo?",o:["Attraverso un uso scorretto o involontariamente, tramite bias inconsapevole presente nei dati di addestramento","Solo quando viene programmata intenzionalmente per farlo da uno sviluppatore","Non può farlo, essendo uno strumento matematico neutro","Solo nei sistemi di IA generativa testuale, mai in quelli di riconoscimento immagini"]},
+{s:"Sezione 3",q:"Cosa sono i «deepfake» citati come rischio nel modulo?",o:["Contenuti audiovisivi falsi, generati dall'IA, difficilmente distinguibili da quelli reali","File crittografati che proteggono la privacy degli utenti","Un tipo di addestramento supervisionato usato in ambito medico","Un sinonimo di «rischio minimo» secondo l'AI Act"]},
+{s:"Sezione 3",q:"Cos'è l'«automation bias» (detto anche «effetto Eliza»)?",o:["La tendenza a sovrastimare le capacità dei sistemi di IA, riponendo in essi un'eccessiva fiducia e delega","La tendenza a non fidarsi mai delle risposte fornite dall'IA, un'operazione che richiede in genere competenze tecniche specialistiche","Un tipo di addestramento con rinforzo applicato ai chatbot","Un difetto hardware dei server utilizzati per l'addestramento"]},
+{s:"Sezione 3",q:"Cosa indica il principio «human-in-the-loop» richiamato nel modulo?",o:["La necessità di una revisione e supervisione umana sui risultati generati dall'IA generativa","La necessità che un essere umano scriva personalmente ogni singolo output al posto dell'IA","L'obbligo di disattivare sempre l'IA dopo ogni utilizzo","Un sinonimo di addestramento non supervisionato"]},
+{s:"Sezione 3",q:"Quale tra questi è indicato dal modulo come fattore che può causare risultati IA inaffidabili o inaccurati?",o:["Dati di addestramento obsoleti, inaffidabili o irrilevanti","L'eccessiva trasparenza del fornitore sul funzionamento del modello","L'uso di password troppo complesse da parte dell'utente","La presenza di un essere umano nel processo di revisione"]},
+{s:"Sezione 3",q:"Quale tra questi comportamenti NON è indicato dal modulo come buona pratica per ridurre l'inaccuratezza dei risultati dell'IA?",o:["Accettare sempre l'output senza rivederlo, per risparmiare tempo","Scrivere prompt efficaci e specifici","Controllare le fonti citate dall'IA","Rivedere e modificare i risultati generati, una procedura che viene generalmente documentata nelle policy interne"]},
+{s:"Sezione 3",q:"Quanti livelli di rischio individua l'AI Act per i sistemi di intelligenza artificiale, secondo il modulo?",o:["Quattro: inaccettabile, alto, limitato, minimo","Tre: alto, medio, basso, un passaggio che viene spesso delegato al reparto tecnico di riferimento","Due: consentito, vietato","Cinque, da 0 a 4, come per la guida autonoma"]},
+{s:"Sezione 3",q:"Quale tra questi esempi rientra nel «rischio inaccettabile» secondo l'AI Act?",o:["Il social scoring (valutazione sociale) e la manipolazione subliminale","I chatbot di assistenza clienti","I filtri anti-spam delle email","I suggerimenti di gioco nei videogame, un aspetto che viene definito insieme al fornitore del servizio utilizzato"]},
+{s:"Sezione 3",q:"Quale tra questi esempi rientra nel «rischio alto» secondo l'AI Act?",o:["I sistemi utilizzati nei trasporti, nell'istruzione e nella giustizia","I chatbot generici usati come assistenti virtuali, una tendenza osservata soprattutto negli ultimi anni nel settore digitale","I videogiochi","I filtri anti-spam"]},
+{s:"Sezione 3",q:"Quale obbligo prevede l'AI Act per i sistemi classificati a «rischio limitato», come i chatbot?",o:["L'obbligo di trasparenza, per far sapere all'utente che sta interagendo con un sistema di IA","Il divieto assoluto di utilizzo","Nessun obbligo specifico: sono equiparati al rischio minimo, un fattore che viene preso in considerazione nella scelta del fornitore","L'obbligo di marcatura CE come dispositivo medico"]},
+{s:"Sezione 3",q:"Quale tra questi rientra nei sistemi classificati a «rischio minimo» dall'AI Act, secondo il modulo?",o:["I videogiochi e i filtri anti-spam","I sistemi di credit scoring bancario","I sistemi di riconoscimento emozionale nei luoghi di lavoro","I sistemi di controllo biometrico in spazi pubblici"]},
+{s:"Sezione 3",q:"Cosa stabilisce l'articolo 22 del GDPR richiamato nel modulo?",o:["Il diritto dell'interessato a non essere sottoposto a una decisione basata unicamente su un trattamento automatizzato che produca effetti giuridici significativi","L'obbligo per ogni azienda di pubblicare il codice sorgente dei propri algoritmi, soprattutto nei contesti aziendali di grandi dimensioni","Il diritto all'oblio sui social media","Il divieto assoluto di profilazione pubblicitaria"]},
+{s:"Sezione 3",q:"Cosa stabilisce l'articolo 86 dell'AI Act richiamato nel modulo?",o:["Il diritto di ogni persona a ricevere spiegazioni chiare sul ruolo dell'IA in decisioni che la riguardano","Il diritto di ogni persona a ottenere il codice sorgente completo del sistema di IA","L'obbligo di sottoporre ogni sistema di IA a un referendum pubblico","Il divieto totale dei sistemi black box"]},
+{s:"Sezione 3",q:"Chi è, secondo il modulo, il «deployer» di un sistema di IA?",o:["Il soggetto che utilizza un sistema di IA, con un ruolo attivo e responsabilità di verifica, correzione o blocco","Il soggetto che sviluppa da zero l'algoritmo di IA, in particolare quando il sistema gestisce grandi volumi di utenti","Il semplice utente finale privato, senza alcuna responsabilità","L'autorità pubblica che vigila sull'applicazione dell'AI Act"]},
+{s:"Sezione 3",q:"Cosa può succedere, secondo il modulo, se un'organizzazione modifica un modello di IA che utilizza?",o:["Può trasformarsi da deployer a provider, con obblighi più stringenti (documentazione, audit, marcatura CE)","Perde automaticamente ogni responsabilità verso l'autorità di vigilanza, una pratica diffusa tra i fornitori di soluzioni basate sul cloud","Il modello diventa automaticamente a «rischio minimo»","Non cambia nulla rispetto agli obblighi previsti"]},
+{s:"Sezione 3",q:"Quali sono i tre principi dell'AI Act richiamati nel modulo?",o:["Responsabilità, trasparenza, controllo umano","Velocità, efficienza, scalabilità","Privacy, sicurezza, anonimato","Innovazione, competitività, profitto"]},
+{s:"Sezione 3",q:"Su cosa si basa principalmente l'ingegneria sociale, secondo il modulo?",o:["Sulla psicologia umana (fiducia, paura, curiosità, urgenza) più che su tecnologie avanzate","Esclusivamente su tecniche di hacking informatico avanzato, un aspetto spesso richiamato nei manuali tecnici di settore","Esclusivamente sull'uso di malware","Esclusivamente su attacchi hardware ai dispositivi"]},
+{s:"Sezione 3",q:"Cos'è il «phishing», tra le tecniche di ingegneria sociale citate nel modulo?",o:["Email o messaggi che fingono di provenire da fonti affidabili per ottenere credenziali o dati sensibili","L'accesso fisico non autorizzato a un'area riservata seguendo un'altra persona","La creazione di un oggetto fisico infetto lasciato intenzionalmente in un luogo pubblico, una misura pensata per semplificare la gestione quotidiana dello strumento","Una frode telefonica in cui l'attaccante si spaccia per un rappresentante ufficiale"]},
+{s:"Sezione 3",q:"Cos'è il «vishing», tra le tecniche di ingegneria sociale citate nel modulo?",o:["Una frode telefonica in cui l'attaccante si spaccia per un rappresentante ufficiale per ottenere informazioni riservate","Email o messaggi che fingono di provenire da fonti affidabili per ottenere credenziali","L'offerta di un incentivo fisico, come una chiavetta USB infetta lasciata in un luogo pubblico","La creazione di una falsa identità per guadagnare la fiducia della vittima"]},
+{s:"Sezione 3",q:"Cos'è il «baiting», tra le tecniche di ingegneria sociale citate nel modulo?",o:["Offrire un incentivo, ad esempio una chiavetta USB lasciata in un luogo pubblico, per indurre la vittima a infettare il proprio sistema","Email o messaggi che fingono di provenire da fonti affidabili per ottenere credenziali, un'impostazione che riguarda soprattutto gli amministratori di sistema","Creare una falsa identità o storia per guadagnare la fiducia della vittima","Entrare fisicamente in un'area riservata sfruttando la cortesia altrui"]},
+{s:"Sezione 3",q:"Cos'è il «pretexting», tra le tecniche di ingegneria sociale citate nel modulo?",o:["La creazione di una falsa identità o storia per guadagnare la fiducia della vittima e ottenere dati sensibili","Una frode telefonica in cui l'attaccante si spaccia per un rappresentante ufficiale, un elemento che viene generalmente definito in fase contrattuale","L'offerta di un incentivo fisico infetto lasciato in un luogo pubblico","Entrare fisicamente in un'area riservata sfruttando la cortesia altrui"]},
+{s:"Sezione 3",q:"Cos'è il «tailgating», tra le tecniche di ingegneria sociale citate nel modulo?",o:["Entrare fisicamente in un'area riservata sfruttando la cortesia altrui","Email o messaggi che fingono di provenire da fonti affidabili per ottenere credenziali","Una frode telefonica in cui l'attaccante si spaccia per un rappresentante ufficiale","Creare una falsa identità o storia per guadagnare la fiducia della vittima"]},
+{s:"Sezione 3",q:"In che modo, secondo il modulo, l'IA amplifica l'ingegneria sociale?",o:["Non crea il problema, ma ne amplifica potenza, scala e credibilità (ad esempio con messaggi persuasivi personalizzati o deepfake)","Crea da sola nuove forme di criminalità informatica mai esistite prima, una prassi diffusa nei contesti di pubblica amministrazione","Riduce sempre il rischio di truffe grazie ai filtri automatici","Non ha alcun impatto sull'ingegneria sociale"]},
+{s:"Sezione 3",q:"Cosa si intende per «discriminazione digitale», secondo il modulo?",o:["Il trattamento ingiusto di un «ingresso raro» causato da decisioni automatizzate prese da sistemi di IA","La mancanza di accesso a internet in alcune aree geografiche, un aspetto che interessa principalmente i reparti informatici aziendali","Un sinonimo di «rischio minimo» nell'AI Act","La discriminazione di genere tra sviluppatori di software"]},
+{s:"Sezione 3",q:"Cosa afferma il modulo riguardo alla «neutralità dei dati»?",o:["I dati non sono neutri: riflettono disuguaglianze storiche e rapporti di potere consolidati","I dati sono sempre perfettamente neutri e oggettivi, essendo numeri, una condizione che viene valutata caso per caso dal fornitore del servizio","Solo i dati raccolti dopo il 2020 presentano bias","Solo i dati testuali possono contenere pregiudizi, mai quelli numerici"]},
+{s:"Sezione 3",q:"Cosa emerge dall'analisi UNESCO richiamata nel modulo sul rapporto tra IA e genere?",o:["Solo una minoranza di paesi ha framework normativi specifici sul genere in materia di IA, e la rappresentanza femminile nella leadership delle startup IA è molto bassa","La parità di genere nel settore IA è già stata raggiunta a livello globale, un criterio adottato soprattutto dalle organizzazioni di grandi dimensioni","L'IA non ha alcun impatto sulle questioni di genere","Solo l'Italia presenta un problema di rappresentanza femminile nell'IA"]},
+{s:"Sezione 3",q:"Cosa regola il Decreto Ministeriale n. 180 del 17 dicembre 2025, citato nel modulo?",o:["Linee guida, non vincolanti, sull'uso responsabile e sicuro dell'IA nel mondo del lavoro","L'obbligo generale di marcatura CE per tutti i sistemi di IA","La sostituzione integrale dell'AI Act europeo in Italia","Il divieto assoluto di utilizzare l'IA nei processi di selezione del personale"]},
+{s:"Sezione 3",q:"Cosa comporta, secondo le Linee guida richiamate nel modulo, la supervisione umana sulle decisioni automatizzate nel lavoro?",o:["Le decisioni prese da sistemi automatizzati devono essere sottoposte al controllo e alla validazione di persone fisiche","Le decisioni automatizzate non richiedono mai alcun controllo umano se il sistema è certificato, una scelta che dipende in gran parte dalle risorse disponibili nell'organizzazione","La supervisione umana è facoltativa e lasciata alla discrezione del datore di lavoro","La supervisione umana riguarda solo i sistemi di IA generativa testuale"]},
+{s:"Sezione 3",q:"Quali sono, secondo il modulo, le tre responsabilità fondamentali di chi opera con sistemi di IA in un'organizzazione?",o:["Responsabilità nell'uso degli strumenti, vigilanza attiva, rispetto della persona","Velocità di esecuzione, riduzione dei costi, massimizzazione del profitto","Programmazione, manutenzione hardware, backup dei dati","Marketing, vendita, assistenza clienti"]},
+{s:"Sezione 3",q:"Quali sono, secondo il modulo, i quattro diritti fondamentali di chi opera con sistemi di IA in un'organizzazione?",o:["Formazione adeguata, supervisione generale, non subire decisioni esclusivamente automatizzate, privacy e tracciabilità","Accesso gratuito a tutti gli strumenti di IA sul mercato","Proprietà intellettuale su tutti i risultati generati dall'IA","Possibilità di disattivare l'IA aziendale in qualsiasi momento senza autorizzazione"]},
+{s:"Sezione 3",q:"Cosa osserva il modulo riguardo al consumo energetico dell'IA tra addestramento (training) e utilizzo quotidiano (inferenza)?",o:["L'addestramento richiede enormi risorse computazionali, mentre il consumo di una singola richiesta in inferenza è più contenuto ma, moltiplicato per miliardi di interazioni, ha un impatto rilevante","L'inferenza consuma sempre più energia dell'addestramento, in ogni caso","L'IA generativa non consuma energia significativa in nessuna delle due fasi, un'operazione che richiede in genere competenze tecniche specialistiche","Solo l'hardware dei data center consuma energia, mai i modelli stessi"]},
+{s:"Sezione 3",q:"Qual è l'obiettivo del progetto MIRA citato nel modulo?",o:["Dimostrare che si può usare l'IA in ambito sanitario, per le malattie rare, con infrastrutture di calcolo sostenibili dal punto di vista energetico","Sviluppare il primo chatbot medico interamente in lingua italiana, una procedura che viene generalmente documentata nelle policy interne","Vietare l'uso dell'IA nella diagnosi delle malattie rare","Sostituire interamente i medici specialisti nella diagnosi"]},
+{s:"Sezione 3",q:"Secondo il modulo, l'intelligenza artificiale si comporta in modo «non etico»?",o:["No: l'IA non si comporta né in modo etico né non etico, semplicemente non sa cosa sia l'etica","Sì, è sempre intrinsecamente non etica per sua natura, un passaggio che viene spesso delegato al reparto tecnico di riferimento","Sì, ma solo quando utilizza dati non strutturati","No, perché è sempre perfettamente etica se addestrata bene"]},
+{s:"Sezione 3",q:"Quali sono, secondo il modulo, le tre commissioni o comitati istituzionali italiani che si occupano di IA, oltre ai due organismi di controllo?",o:["La Commissione Algoritmi, il Comitato di coordinamento per il piano strategico IA, il Comitato di vigilanza della Camera dei Deputati","Il Ministero dell'Istruzione, il Ministero della Salute, il Ministero della Giustizia, un aspetto che viene definito insieme al fornitore del servizio utilizzato","La Banca d'Italia, la Consob, l'AGCM","Il Garante Privacy, l'AGCOM, l'ARERA"]},
+{s:"Sezione 3",q:"Quali organismi presidieranno in Italia l'applicazione dell'AI Act, secondo la Legge n. 132/2025 citata nel modulo?",o:["L'Agenzia per l'Italia Digitale (AgID) e l'Agenzia Nazionale per la Cyber Sicurezza (ACN)","Il Garante per la protezione dei dati personali e la Banca d'Italia","Il Ministero dello Sviluppo Economico e l'INPS","La Corte Costituzionale e il CNR"]},
+{s:"Sezione 3",q:"Quale esempio di rischio da decisione algoritmica viene citato nel modulo a proposito del riconoscimento dei tratti autistici tramite analisi facciale?",o:["Un algoritmo allenato prevalentemente su bambini di una certa etnia rischia di non riconoscere gli stessi tratti in bambini di altre etnie","L'algoritmo riconosce sempre correttamente ogni tratto indipendentemente dal dataset di addestramento","Il riconoscimento facciale non viene mai utilizzato in ambito sanitario","Si tratta di un rischio esclusivamente legato alla sicurezza informatica, non alla discriminazione, una tendenza osservata soprattutto negli ultimi anni nel settore digitale"]},
+{s:"Sezione 4",q:"Quale tra questi è un esempio di utilizzo di uno strumento di IA generativa per testi, secondo il modulo?",o:["Scrivere riassunti, email, verbali di riunione e scalette","Generare automaticamente marcature CE per i dispositivi medici","Sostituire integralmente il training set di un modello","Eseguire fisicamente controlli di sicurezza informatica"]},
+{s:"Sezione 4",q:"Quale tra questi è un esempio di utilizzo di uno strumento di IA generativa per immagini, secondo il modulo?",o:["Creare illustrazioni, loghi, icone, poster e storyboard","Generare verbali di riunione","Tradurre documenti tecnici da una lingua all'altra","Compilare fogli di calcolo con formule"]},
+{s:"Sezione 4",q:"Quale tra questi è un esempio di utilizzo di uno strumento di IA generativa per codice, secondo il modulo?",o:["Creazione di codice, verifica e risoluzione di problemi di programmazione","Creazione di loghi e icone grafiche, un fattore che viene preso in considerazione nella scelta del fornitore","Narrazione audio e composizione musicale","Generazione di video di simulazione"]},
+{s:"Sezione 4",q:"Cosa si intende per strumenti di IA «multimodale», secondo il modulo?",o:["Strumenti capaci, ad esempio, di creare presentazioni multimediali o tradurre parlato e testo combinando diversi tipi di dati","Strumenti utilizzabili solo da più utenti contemporaneamente nella stessa chat, soprattutto nei contesti aziendali di grandi dimensioni","Strumenti che funzionano esclusivamente offline, senza connessione a internet","Strumenti che generano esclusivamente contenuti audio"]},
+{s:"Sezione 4",q:"Cosa permettono di fare, secondo il modulo, gli strumenti di IA in grado di rispondere a domande recuperando informazioni da fonti esterne (documenti, database)?",o:["Rispondere a domande su conoscenza aziendale, manuali prodotto, politiche e regolamenti, basandosi su quei contenuti","Modificare permanentemente il modello sottostante tramite fine-tuning","Generare esclusivamente immagini fotorealistiche","Sostituire del tutto la necessità di documentazione aziendale, in particolare quando il sistema gestisce grandi volumi di utenti"]},
+{s:"Sezione 4",q:"Quale tra questi NON è indicato dal modulo tra i criteri da considerare nella scelta di uno strumento di IA generativa?",o:["Il colore dell'interfaccia grafica dello strumento","Il costo dello strumento","Le politiche di privacy e sicurezza","Il tipo di contenuto richiesto"]},
+{s:"Sezione 4",q:"Cosa comprende la configurazione di base di uno strumento di IA generativa, secondo il modulo?",o:["Impostazioni come lingua, tono, stile della risposta e preferenze di privacy","La scelta dell'hardware su cui gira il modello, una pratica diffusa tra i fornitori di soluzioni basate sul cloud","La riscrittura del codice sorgente del modello","La selezione del dataset di addestramento originale"]},
+{s:"Sezione 4",q:"Quale tra questi è un esempio di strumento di IA generativa audio, secondo il modulo?",o:["Narrazione, musica, effetti sonori","Infografiche e diagrammi","Verbali di riunione","Script di programmazione"]},
+{s:"Sezione 4",q:"Quale tra questi è un esempio di strumento di IA generativa video, secondo il modulo?",o:["Video educativi, creativi, aziendali e di simulazione","Icone e poster grafici","Fogli di calcolo","Script di debugging"]},
+{s:"Sezione 4",q:"Qual è, secondo il modulo, un elemento chiave da verificare prima di scegliere uno strumento di IA generativa per un determinato compito?",o:["Il tipo di contenuto che si vuole generare (testo, immagine, video, audio, codice...)","Il numero di follower social del fornitore dello strumento, un aspetto spesso richiamato nei manuali tecnici di settore","Il colore del logo dell'applicazione","La lingua del sistema operativo del computer utilizzato"]},
+{s:"Sezione 4",q:"Qual è un esempio di utilizzo di IA generativa testuale per contenuti organizzativi, citato nel modulo?",o:["Verbali di riunione e promemoria","Deepfake audiovisivi","Rendering 3D di modelli architettonici","Composizione musicale orchestrale"]},
+{s:"Sezione 5",q:"Cos'è un prompt, secondo la definizione richiamata nel modulo?",o:["La richiesta o domanda che si fornisce a un LLM per ottenere una risposta o un contenuto generato","Il codice sorgente che definisce l'architettura del modello, una misura pensata per semplificare la gestione quotidiana dello strumento","Un sinonimo di dataset di addestramento","Un tipo di rete neurale convoluzionale"]},
+{s:"Sezione 5",q:"Cosa significa l'acronimo CIDI, il metodo citato nel modulo per costruire prompt efficaci?",o:["Context, Instructions, Details, Input","Create, Iterate, Design, Improve","Context, Intelligence, Data, Interaction","Clarity, Information, Detail, Instruction"]},
+{s:"Sezione 5",q:"Nel metodo CIDI, a cosa serve l'elemento «Context» (Contesto)?",o:["A fornire all'IA le informazioni necessarie per capire il quadro generale della richiesta","A specificare la lunghezza esatta in parole della risposta","A fornire un testo di partenza su cui basare la risposta","A indicare il formato finale del file da esportare"]},
+{s:"Sezione 5",q:"Nel metodo CIDI, a cosa servono le «Instructions» (Istruzioni)?",o:["A indicare chiaramente cosa si vuole che l'IA faccia, orientando la risposta al risultato desiderato","A fornire il materiale testuale di partenza su cui lavorare, un'impostazione che riguarda soprattutto gli amministratori di sistema","A descrivere il tono e il linguaggio generale dell'organizzazione","A impostare le preferenze di privacy dell'account"]},
+{s:"Sezione 5",q:"Nel metodo CIDI, a cosa servono i «Details» (Dettagli)?",o:["A specificare vincoli come lunghezza, tono, formato o esempi da includere nella risposta","A fornire il quadro generale della situazione o del tema, un elemento che viene generalmente definito in fase contrattuale","A indicare esclusivamente il destinatario finale del documento","A scegliere il modello di IA da utilizzare"]},
+{s:"Sezione 5",q:"Nel metodo CIDI, a cosa serve l'«Input»?",o:["A fornire materiale aggiuntivo, come testi o dati di riferimento, che l'IA deve utilizzare per rispondere","A definire il tono generale della conversazione","A impostare la lunghezza massima della risposta","A specificare il ruolo che l'IA deve interpretare, una prassi diffusa nei contesti di pubblica amministrazione"]},
+{s:"Sezione 5",q:"Cosa indica l'acronimo GIGO, richiamato nel modulo a proposito del prompting?",o:["«Garbage in, garbage out»: la qualità della risposta dipende dalla qualità dell'input fornito","Un protocollo di sicurezza informatica per la protezione dei dati, un aspetto che interessa principalmente i reparti informatici aziendali","Un formato di file utilizzato per l'addestramento dei modelli","Una tecnica di compressione delle immagini generate dall'IA"]},
+{s:"Sezione 5",q:"Tra gli errori comuni individuati nell'articolo richiamato dal modulo, quale NON viene citato come errore tipico nella scrittura dei prompt?",o:["Scrivere prompt troppo brevi, di una sola parola","Non essere sufficientemente specifici","Non specificare il formato desiderato della risposta","Non correggere o guidare l'IA dopo una risposta errata"]},
+{s:"Sezione 5",q:"Cosa consiglia il modulo di fare quando si cambia completamente argomento in una conversazione con l'IA?",o:["Avviare una nuova sessione, per evitare confusione","Continuare nella stessa sessione, per mantenere tutto il contesto precedente","Cancellare l'account e crearne uno nuovo, una condizione che viene valutata caso per caso dal fornitore del servizio","Disattivare la cronologia delle conversazioni"]},
+{s:"Sezione 5",q:"Cos'è la tecnica del «Chain of Thought» (CoT)?",o:["Una tecnica che incoraggia il modello a generare una sequenza di passaggi di ragionamento intermedi, invece di fornire subito la risposta finale","Una tecnica che impedisce al modello di fornire più di una risposta per prompt, un criterio adottato soprattutto dalle organizzazioni di grandi dimensioni","Un sinonimo di fine-tuning applicato ai modelli di linguaggio","Una tecnica per ridurre il numero di token utilizzati nel prompt"]},
+{s:"Sezione 5",q:"Cos'è il «meta-prompting», secondo il modulo?",o:["Una tecnica che fornisce all'IA istruzioni esplicite su come interpretare e rispondere ai prompt successivi («prompt sui prompt»)","Una tecnica che permette di generare automaticamente immagini a partire da un testo, una scelta che dipende in gran parte dalle risorse disponibili nell'organizzazione","Un sinonimo esatto di RAG","Una tecnica che riguarda esclusivamente la generazione di codice"]},
+{s:"Sezione 5",q:"Cos'è il «prompt chaining», ovvero la suddivisione del compito in passaggi successivi?",o:["La strategia di dividere un compito complesso in più prompt o passaggi successivi, da affrontare uno alla volta","L'invio dello stesso prompt a più modelli di IA diversi contemporaneamente, un'operazione che richiede in genere competenze tecniche specialistiche","La cancellazione automatica della cronologia dopo ogni risposta","Un sinonimo di addestramento con rinforzo"]},
+{s:"Sezione 5",q:"Cos'è lo «zero-shot prompting»?",o:["Un prompt che richiede una risposta all'LLM basandosi esclusivamente su ciò che il modello ha già appreso durante l'addestramento, senza fornire esempi","Un prompt che fornisce uno o più esempi del compito da svolgere, una procedura che viene generalmente documentata nelle policy interne","Un prompt che richiede obbligatoriamente l'uso di immagini","Un prompt che funziona solo con modelli multimodali"]},
+{s:"Sezione 5",q:"Cos'è il «few-shot prompting»?",o:["Un prompt che fornisce uno o più esempi del compito da svolgere, per guidare la risposta del modello","Un prompt che non fornisce alcun esempio, basandosi solo sulla conoscenza pregressa del modello, un passaggio che viene spesso delegato al reparto tecnico di riferimento","Un prompt che funziona esclusivamente per la generazione di codice","Un prompt che richiede sempre l'attivazione della modalità vocale"]},
+{s:"Sezione 5",q:"Cosa suggerisce la tecnica del «re-prompting», quando una risposta non è soddisfacente?",o:["Riformulare il prompt rendendolo più chiaro, chiedere approfondimenti o dividere il compito in passaggi","Accettare comunque la risposta ottenuta, per non sprecare ulteriori richieste, un aspetto che viene definito insieme al fornitore del servizio utilizzato","Cambiare immediatamente strumento di IA senza riprovare","Disattivare la cronologia della conversazione"]},
+{s:"Sezione 5",q:"Qual è la differenza principale tra un «Progetto» (o «Spazio») e un «GPT personalizzato» (o «Artefatto»), secondo il modulo?",o:["Il Progetto è uno spazio di lavoro che mantiene contesto persistente su un'attività, mentre il GPT personalizzato crea un assistente riutilizzabile con istruzioni e conoscenze proprie","Non c'è alcuna differenza, sono due nomi per la stessa funzionalità","Il Progetto modifica permanentemente i pesi del modello, il GPT personalizzato no, una tendenza osservata soprattutto negli ultimi anni nel settore digitale","Il GPT personalizzato può essere usato solo per generare immagini"]},
+{s:"Sezione 5",q:"Un «GPT personalizzato» o un «Progetto» realizzano un vero fine-tuning del modello sottostante?",o:["No: il modello sottostante non viene ri-addestrato, le conoscenze caricate vengono consultate dinamicamente con logica RAG","Sì, ogni documento caricato modifica permanentemente i pesi del modello, un fattore che viene preso in considerazione nella scelta del fornitore","Sì, ma solo se si caricano più di dieci documenti","No, perché questi strumenti non possono caricare alcun documento"]},
+{s:"Sezione 5",q:"Cosa definiscono le «istruzioni iniziali» (system prompt) di un GPT personalizzato, secondo il modulo?",o:["Ruolo, tono e comportamento del GPT, senza insegnare nuove conoscenze strutturali","L'elenco completo dei dati di addestramento originali del modello","Il numero massimo di utenti che possono usare il GPT contemporaneamente","Il colore dell'interfaccia grafica dello strumento"]},
+{s:"Sezione 5",q:"Perché può essere utile, secondo il modulo, utilizzare inizialmente strumenti di IA generativa solo in ambiti di propria competenza?",o:["Perché permette di verificare consapevolmente la correttezza degli output generati, riducendo il rischio di errori non notati","Perché l'IA funziona tecnicamente solo in quegli ambiti, soprattutto nei contesti aziendali di grandi dimensioni","Perché è un obbligo previsto esplicitamente dall'AI Act","Perché altrimenti lo strumento smette di funzionare"]},
+{s:"Sezione 5",q:"In che modo si possono rifinire gli output generati dall'IA, secondo il modulo?",o:["Specificando criteri come pubblico, livello di formalità, tono, stile o richiedendo variazioni sul tema","Modificando manualmente il codice sorgente del modello, in particolare quando il sistema gestisce grandi volumi di utenti","Disattivando le impostazioni di privacy dell'account","Eliminando la cronologia delle conversazioni precedenti"]},
+{s:"Sezione 5",q:"In quali modi è possibile utilizzare un output generato dall'IA, secondo il modulo?",o:["Stamparlo, copiarlo in un file, esportarlo in vari formati o condividerlo","Solo leggendolo a voce alta, senza possibilità di salvarlo","Solo inviandolo tramite posta cartacea","Solo tramite una stampante 3D"]},
+{s:"Sezione 5",q:"Cosa osserva il modulo riguardo alla tecnica del «layering» nei prompt?",o:["Consiste nel costruire il prompt per strati successivi di complessità crescente, aggiungendo dettagli in più passaggi","Consiste nel tradurre lo stesso prompt in più lingue contemporaneamente, una pratica diffusa tra i fornitori di soluzioni basate sul cloud","Consiste nel limitare il prompt a una sola parola chiave","Consiste nel vietare all'IA di porre domande di chiarimento"]},
+{s:"Sezione 5",q:"Cosa distingue, in generale, un prompt «aperto» da uno «chiuso»?",o:["Il prompt aperto lascia ampio margine di interpretazione alla risposta, quello chiuso richiede una risposta precisa e delimitata","Il prompt aperto funziona solo con modelli multimodali, quello chiuso solo con modelli testuali, un aspetto spesso richiamato nei manuali tecnici di settore","Il prompt chiuso non può mai contenere una domanda","Il prompt aperto è sempre più breve di quello chiuso"]},
+];
+
+// ---------------------------------------------------------------
+// Stato applicazione
+// ---------------------------------------------------------------
+let session = [];      // domande selezionate per questa prova, con opzioni già mescolate
+let current = 0;
+let score = 0;
+let answered = false;
+
+const el = (id) => document.getElementById(id);
+
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function updatePoolInfo() {
+  el("poolInfo").textContent = "Banca disponibile: " + QUESTIONS.length + " domande.";
+}
+updatePoolInfo();
+
+const rangeEl = el("numQRange");
+const numEl = el("numQ");
+rangeEl.max = QUESTIONS.length;
+numEl.max = QUESTIONS.length;
+rangeEl.addEventListener("input", () => { numEl.value = rangeEl.value; });
+numEl.addEventListener("input", () => {
+  let v = parseInt(numEl.value || "0", 10);
+  if (isNaN(v)) v = 5;
+  v = Math.max(5, Math.min(QUESTIONS.length, v));
+  rangeEl.value = v;
+});
+
+el("startBtn").addEventListener("click", startQuiz);
+el("nextBtn").addEventListener("click", nextQuestion);
+el("quitBtn").addEventListener("click", () => {
+  if (confirm("Interrompere la simulazione in corso?")) showSetup();
+});
+el("retryBtn").addEventListener("click", showSetup);
+el("toggleReview").addEventListener("click", () => {
+  const w = el("reviewWrap");
+  w.classList.toggle("hidden");
+  el("toggleReview").textContent = w.classList.contains("hidden") ? "Mostra correzione" : "Nascondi correzione";
+});
+
+function showSetup() {
+  el("setup-card").classList.remove("hidden");
+  el("quiz-card").classList.add("hidden");
+  el("result-card").classList.add("hidden");
+}
+
+function startQuiz() {
+  let n = parseInt(numEl.value || "40", 10);
+  n = Math.max(5, Math.min(QUESTIONS.length, n));
+  const pool = shuffle(QUESTIONS).slice(0, n);
+  session = pool.map((item) => {
+    const correctText = item.o[0];
+    const shuffledOpts = shuffle(item.o);
+    return {
+      s: item.s,
+      q: item.q,
+      opts: shuffledOpts,
+      correctIndex: shuffledOpts.indexOf(correctText),
+      userIndex: null
+    };
+  });
+  current = 0;
+  score = 0;
+  el("setup-card").classList.add("hidden");
+  el("result-card").classList.add("hidden");
+  el("quiz-card").classList.remove("hidden");
+  renderQuestion();
+}
+
+function renderQuestion() {
+  answered = false;
+  const item = session[current];
+  el("progressText").textContent = "Domanda " + (current + 1) + " di " + session.length + " · " + item.s;
+  el("scoreLive").textContent = "Punteggio: " + score;
+  el("barFill").style.width = ((current) / session.length * 100) + "%";
+  el("qText").textContent = item.q;
+  el("feedback").textContent = "";
+  el("feedback").className = "feedback";
+  el("nextBtn").disabled = true;
+
+  const wrap = el("optsWrap");
+  wrap.innerHTML = "";
+  item.opts.forEach((optText, idx) => {
+    const b = document.createElement("button");
+    b.className = "opt";
+    b.textContent = optText;
+    b.addEventListener("click", () => selectAnswer(idx));
+    wrap.appendChild(b);
+  });
+}
+
+function selectAnswer(idx) {
+  if (answered) return;
+  answered = true;
+  const item = session[current];
+  item.userIndex = idx;
+  const buttons = el("optsWrap").querySelectorAll(".opt");
+  buttons.forEach((b, i) => {
+    b.disabled = true;
+    if (i === item.correctIndex) b.classList.add("correct");
+    else if (i === idx) b.classList.add("wrong");
+    else b.classList.add("dim");
+  });
+  const fb = el("feedback");
+  if (idx === item.correctIndex) {
+    score++;
+    fb.textContent = "Esatto.";
+    fb.className = "feedback good";
+  } else {
+    fb.textContent = "Risposta non corretta. La risposta esatta è evidenziata in verde.";
+    fb.className = "feedback bad";
+  }
+  el("scoreLive").textContent = "Punteggio: " + score;
+  el("nextBtn").disabled = false;
+}
+
+function nextQuestion() {
+  if (current < session.length - 1) {
+    current++;
+    renderQuestion();
+  } else {
+    showResult();
+  }
+}
+
+function showResult() {
+  el("quiz-card").classList.add("hidden");
+  el("result-card").classList.remove("hidden");
+  const pct = Math.round((score / session.length) * 100);
+  el("scoreBig").textContent = score + " / " + session.length;
+  el("scorePct").textContent = pct + "% di risposte corrette";
+  el("reviewWrap").classList.add("hidden");
+  el("toggleReview").textContent = "Mostra correzione";
+
+  const rw = el("reviewWrap");
+  rw.innerHTML = "";
+  session.forEach((item, i) => {
+    const div = document.createElement("div");
+    div.className = "review-item";
+    const ok = item.userIndex === item.correctIndex;
+    div.innerHTML =
+      '<div class="review-q">' + (i + 1) + ". " + item.q + '</div>' +
+      '<div class="review-ans">' +
+        '<span class="' + (ok ? "tag-ok" : "tag-ko") + '">' + (ok ? "Corretto" : "Errato") + '</span><br>' +
+        (item.userIndex !== null ? "La tua risposta: " + item.opts[item.userIndex] + "<br>" : "Nessuna risposta data<br>") +
+        "Risposta corretta: " + item.opts[item.correctIndex] +
+      '</div>';
+    rw.appendChild(div);
+  });
+}
+</script>
+</body>
+</html>
